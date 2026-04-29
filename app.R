@@ -595,7 +595,7 @@ server <- function(input, output, session) {
         labels = percent_formatter,
         guide = guide_colorbar(barwidth = 15)
       ) +
-      scale_alpha_continuous(guide = FALSE, range = c(0.85, 0.98), trans = "sqrt") +
+      scale_alpha_continuous(guide = "none", range = c(0.85, 0.98), trans = "sqrt") +
       theme(legend.text = element_text(size = 12), 
             legend.title = element_text(face = 'bold', size = 18)
       ) + 
