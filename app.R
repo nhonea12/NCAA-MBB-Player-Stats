@@ -369,6 +369,19 @@ ui <- fluidPage(
         label = "Player:",
         value = "Paul McNeil Jr."
       ),
+      # allow user to select season to view (2021-22 through 2025-26)
+      selectInput(
+        inputId = "season",
+        label = "Season:",
+        choices = list(
+          "2025-26" = 2026, 
+          "2024-25" = 2025, 
+          "2023-24" = 2024, 
+          "2022-23" = 2023, 
+          "2021-22" = 2022
+        ),
+        selected = 2026
+      ),
       # require action button to see a new player
       actionButton(
         inputId = "action_button",
@@ -436,7 +449,8 @@ ui <- fluidPage(
           gt_output(outputId = "player_metrics"),
           stat_header("Player Impact Metrics vs. Top 100 Teams", "gp_top_100_metric"),
           gt_output(outputId = "player_metrics_vs_good")
-        )
+        ),
+        card_footer("Created by Nathan Honea. Data from ESPN and Bart Torvik.")
       )
     )
   )
@@ -448,26 +462,31 @@ server <- function(input, output, session) {
   player_stats <- eventReactive(input$action_button, {
     player_stats_total |> 
       filter(team_location == input$team_name, 
-             athlete_display_name == input$player_name)
+             athlete_display_name == input$player_name,
+             season == input$season)
   })
   
   # subset the data to only the specified player's stats vs good teams, only update when the action button is pressed
   player_stats_vs_good_teams <- eventReactive(input$action_button, {
     player_stats_vs_tournament |> 
       filter(team_location == input$team_name, 
-             athlete_display_name == input$player_name)
+             athlete_display_name == input$player_name,
+             season == input$season)
   })
   
   # subset the data to only the specified player's shots, only update when the action button is pressed
   player_shots <- eventReactive(input$action_button, {
     mbb_shots |> 
       filter(team_location == input$team_name, 
-             athlete_display_name == input$player_name)
+             athlete_display_name == input$player_name,
+             season == input$season)
   })
   
   # create hexagonal shot data for hexagonal shot charts
   player_hexbin_data <- eventReactive(input$action_button, {
-    calculate_hexbins_from_shots(shots = player_shots(), league_averages = averages)
+    calculate_hexbins_from_shots(shots = player_shots(), 
+                                 league_averages = averages |> filter(season == input$season)
+                                 )
   })
   
   output$player_headshot <- renderUI({
@@ -623,7 +642,7 @@ server <- function(input, output, session) {
     player_stats()$GP
   })
   
-  # games played vs tournamet teams
+  # games played vs tournament teams
   output$gp_tourny_basic    <- renderText({
     player_stats_vs_good_teams()$GP
   })
