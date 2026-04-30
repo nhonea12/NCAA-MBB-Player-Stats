@@ -5,6 +5,6 @@ account: nhonea12
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 17017607
-bundleId: 11926563
+bundleId: 11931234
 url: https://nhonea12.shinyapps.io/ncaa-mbb-player-stats/
 version: 1
